@@ -14,7 +14,11 @@ def addUser(usersdata)->None:
     location:str=input("Podaj nazwe miejscowosci: ")
     posts:int=input("Podaj liczbe postow: ")
     usersdata.append({"name":name, "location":location, "posts":posts})
-
+def removeUser(usersdata)->None:
+    tmp_name:str=input("Podaj imie uzytkownika ktorego chcesz usunac: ")
+    for n in usersdata:
+        if n['name']==tmp_name:
+            usersdata.remove(n)
 while True:
     tmp_choice:int=int(input('Wybierz opcje menu: '))
     if tmp_choice==0:
@@ -27,6 +31,7 @@ while True:
         addUser(users)
     if tmp_choice==3:
         print('Wybrano funkcje usuwania znajomego')
+        removeUser(users)
     if tmp_choice==4:
         print('Wybrano funkcje aktyalizacji znajomego')
 
