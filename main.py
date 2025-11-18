@@ -1,30 +1,84 @@
-from mapbook_lib.model import users    
-from mapbook_lib.controller import user_info, addUser, removeUser, updateUser, GetMap
+from tkinter import *
 
-def main():
-    while True:
-        print("\n===================MENU===================\n0. Wyjscie\n1. Wyswietl informacje o znajomych\n2. Dodaj znajomego\n3. Usun znajomego\n4. Aktualizuj znajomego\n5. Wyswietl mape\n==========================================")
-        tmp_choice:int=int(input('Wybierz opcje menu: '))
-        if tmp_choice==0:
-            break
-        if tmp_choice==1:
-            print('Wybrano funkcje wyswietlania aktywnosci znajomych')
-            user_info(users)
-        if tmp_choice==2:
-            print('Wybrano funkcje dodawania znajomego')
-            addUser(users)
-        if tmp_choice==3:
-            print('Wybrano funkcje usuwania znajomego')
-            removeUser(users)
-        if tmp_choice==4:
-            print('Wybrano funkcje aktyalizacji znajomego')
-            updateUser(users)
-        if tmp_choice==5:
-            print('Wybrano funkcje wyświetlania mapy z uzytkownikami')
-            GetMap(users)
-            
-if __name__=="__main__":
-    main()
-        
 
-    
+root= Tk()
+root.title("Mapbook")
+root.geometry("1025x760")
+
+ramka_lista_obiektow= Frame(root)
+ramka_formularz=Frame(root)
+ramka_szczegoly_obiektu=Frame(root)
+ramka_mapa=Frame(root)
+
+ramka_lista_obiektow.grid(row=0,column=0)
+ramka_formularz.grid(row=0, column=1)
+ramka_szczegoly_obiektu.grid(row=1,column=0)
+ramka_mapa.grid(row=1,column=1)
+
+# RAMKA LISTA OBIEKTOW
+label_lista_obiektow=Label(ramka_lista_obiektow, text="Lista obiektów")
+label_lista_obiektow.grid(row=0,column=0, columnspan=3)
+listbox_lista_obiektow=Listbox(ramka_lista_obiektow)
+listbox_lista_obiektow.grid(row=1,column=0, columnspan=3)
+
+button_pokaz_szczegoly=Button(ramka_lista_obiektow, text="Pokaż szczegóły")
+button_pokaz_szczegoly.grid(row=2,column=0)
+
+button_usun_obiekt=Button(ramka_lista_obiektow,text="Usuń obiekt")
+button_usun_obiekt.grid(row=2, column=1)
+
+button_edytuj_obiekt=Button(ramka_lista_obiektow,text="Edytuj obiekt")
+button_edytuj_obiekt.grid(row=2, column=2)
+
+# RAMKA FORMULARZ
+
+label_formularz=Label(ramka_formularz, text="Formularz:")
+label_formularz.grid(row=0,column=0,columnspan=2)
+
+label_imie=Label(ramka_formularz, text="Imie: ")
+label_imie.grid(row=1,column=0, sticky=W)
+label_lokalizacja=Label(ramka_formularz, text="Lokalizacja: ")
+label_lokalizacja.grid(row=2,column=0, sticky=W)
+label_posty=Label(ramka_formularz, text="Posty: ")
+label_posty.grid(row=3,column=0, sticky=W)
+label_imgurl=Label(ramka_formularz, text="Img URL: ")
+label_imgurl.grid(row=4,column=0, sticky=W)
+
+entry_name=Entry(ramka_formularz)
+entry_name.grid(row=1,column=1)
+entry_lokalizacja=Entry(ramka_formularz)
+entry_lokalizacja.grid(row=2,column=1)
+entry_posty=Entry(ramka_formularz)
+entry_posty.grid(row=3,column=1)
+entry_imgurl=Entry(ramka_formularz)
+entry_imgurl.grid(row=4,column=1)
+
+button_dodaj_obiekt=Button(ramka_formularz, text="Dodaj obiekt")
+button_dodaj_obiekt.grid(row=5,column=0,columnspan=2)
+
+# RAMKA SZCZEGOLY OBIEKTU
+
+label_szczegoly_obiektu=Label(ramka_szczegoly_obiektu,text="Szczegóły obiektu")
+label_szczegoly_obiektu.grid(row=0,column=0,sticky=W)
+label_imie_szczegoly_obiektu=Label(ramka_szczegoly_obiektu, text="Imie: ")
+label_imie_szczegoly_obiektu.grid(row=1,column=0)
+label_imie_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
+label_imie_szczegoly_obiektu_wartosc.grid(row=1,column=1)
+
+label_lokalizacja_szczegoly_obiektu=Label(ramka_szczegoly_obiektu, text="Lokalizacja: ")
+label_lokalizacja_szczegoly_obiektu.grid(row=2,column=0)
+label_lokalizacja_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
+label_lokalizacja_szczegoly_obiektu_wartosc.grid(row=2,column=1)
+
+label_posty_szczegoly_obiektu=Label(ramka_szczegoly_obiektu, text="Posty: ")
+label_posty_szczegoly_obiektu.grid(row=3,column=0)
+label_posty_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
+label_posty_szczegoly_obiektu_wartosc.grid(row=3,column=1)
+
+# RAMKA MAPA
+map_widget=tkintermapview.TkinterMapView(ramka_mapa, width=1025, height=600, corner_radius=0)
+map_widget.set_posion(52.22977, 21.01178) # Warszawa
+map_widget.set_zoom(6)
+map_widget.grid(row=0,column=0)
+
+root.mainloop()
