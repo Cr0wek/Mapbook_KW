@@ -9,6 +9,7 @@ class User:
         self.posts = posts
         self.img_url = img_url
         self.coords = self.get_coords()
+        self.marker = map_widget.set_marker(self.coords[0], self.coords[1], text=self.name)
     
     def get_coords(self):
         from bs4 import BeautifulSoup
@@ -48,6 +49,7 @@ def user_info(usersdata:list)->None:
         
 def removeUser(usersdata:list)->None:
     i=listbox_lista_obiektow.index(ACTIVE)
+    usersdata[i].marker.delete()
     usersdata.pop(i)
     user_info(usersdata)
     
@@ -72,6 +74,8 @@ def updateUser(usersdata:list, i:int)->None:
     usersdata[i].posts=int(entry_posty.get())
     usersdata[i].img_url=entry_imgurl.get()
     usersdata[i].coords=usersdata[i].get_coords()
+    usersdata[i].marker.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
+    usersdata[i].marker.set_text(usersdata[i].name)
     user_info(usersdata)
     map_widget.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
     entryClear()
@@ -154,7 +158,7 @@ label_posty_szczegoly_obiektu_wartosc.grid(row=1,column=5)
 # RAMKA MAPA
 map_widget=tkintermapview.TkinterMapView(ramka_mapa, width=800, height=600, corner_radius=10)
 map_widget.set_position(52.22977, 21.01178) # Warszawa
-map_widget.set_zoom(6)
+map_widget.set_zoom(10)
 map_widget.grid(row=0,column=0)
 
 root.mainloop()
