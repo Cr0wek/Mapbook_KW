@@ -1,12 +1,85 @@
 from tkinter import *
 import tkintermapview
 
+users:list=[]
+class User:
+    def __init__(self, name:str, location:str, posts:int, img_url:str):
+        self.name = name
+        self.location = location
+        self.posts = posts
+        self.img_url = img_url
+        self.coords = self.get_coords()
+    
+    def get_coords(self):
+        from bs4 import BeautifulSoup
+        import requests
+        url:str=f'https://pl.wikipedia.org/wiki/{self.location}'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response=requests.get(url, headers=headers)
+        response_html=BeautifulSoup(response.text, 'html.parser')
+        latitude=float(response_html.select('.latitude')[1].text.replace(',','.'))
+        longitude=float(response_html.select('.longitude')[1].text.replace(',','.'))
+        return [latitude, longitude]
 
+def entryClear():
+    entry_name.delete(0, END)
+    entry_lokalizacja.delete(0, END)
+    entry_posty.delete(0, END)
+    entry_imgurl.delete(0, END)
+    entry_name.focus()
 
+def addUser(usersdata:list)->None:
+    name:str=entry_name.get()
+    location:str=entry_lokalizacja.get()
+    posts:int=int(entry_posty.get())
+    image:str=entry_imgurl.get()
+    usersdata.append(User(name=name, location=location, posts=posts, img_url=image))
+    print(usersdata)
+    user_info(usersdata)
+    entryClear()
+    map_widget.set_position(usersdata[-1].coords[0], usersdata[-1].coords[1])
+    
+def user_info(usersdata:list)->None:
+    listbox_lista_obiektow.delete(0, END)
+    for idx, user in enumerate(usersdata):
+        listbox_lista_obiektow.insert(idx, f'{user.name} from {user.location} with {user.posts} posts')
+        
+def removeUser(usersdata:list)->None:
+    i=listbox_lista_obiektow.index(ACTIVE)
+    usersdata.pop(i)
+    user_info(usersdata)
+    
+def user_details(usersdata:list)->None:
+    i=listbox_lista_obiektow.index(ACTIVE)
+    label_imie_szczegoly_obiektu_wartosc.config(text=usersdata[i].name)
+    label_lokalizacja_szczegoly_obiektu_wartosc.config(text=usersdata[i].location)
+    label_posty_szczegoly_obiektu_wartosc.config(text=usersdata[i].posts)
+    map_widget.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
+
+def editUser(usersdata:list)->None:
+    i=listbox_lista_obiektow.index(ACTIVE)
+    entry_name.insert(0,usersdata[i].name)
+    entry_lokalizacja.insert(0,usersdata[i].location)
+    entry_posty.insert(0,usersdata[i].posts)
+    entry_imgurl.insert(0,usersdata[i].img_url)
+    button_dodaj_obiekt.config(text="Zapisz zmiany", command=lambda: updateUser(usersdata, i))
+
+def updateUser(usersdata:list, i:int)->None:
+    usersdata[i].name=entry_name.get()
+    usersdata[i].location=entry_lokalizacja.get()
+    usersdata[i].posts=int(entry_posty.get())
+    usersdata[i].img_url=entry_imgurl.get()
+    usersdata[i].coords=usersdata[i].get_coords()
+    user_info(usersdata)
+    map_widget.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
+    entryClear()
+    button_dodaj_obiekt.config(text="Dodaj obiekt", command=lambda: addUser(users))
 
 root= Tk()
 root.title("Mapbook")
-root.geometry("1150x760")
+root.geometry("800x870")
 
 ramka_lista_obiektow= Frame(root)
 ramka_formularz=Frame(root)
@@ -21,16 +94,16 @@ ramka_mapa.grid(row=2,column=0,columnspan=2)
 # RAMKA LISTA OBIEKTOW
 label_lista_obiektow=Label(ramka_lista_obiektow, text="Lista obiektów")
 label_lista_obiektow.grid(row=0,column=0, columnspan=3)
-listbox_lista_obiektow=Listbox(ramka_lista_obiektow)
+listbox_lista_obiektow=Listbox(ramka_lista_obiektow, width=40, height=10)
 listbox_lista_obiektow.grid(row=1,column=0, columnspan=3)
 
-button_pokaz_szczegoly=Button(ramka_lista_obiektow, text="Pokaż szczegóły")
+button_pokaz_szczegoly=Button(ramka_lista_obiektow, text="Pokaż szczegóły", command=lambda: user_details(users))
 button_pokaz_szczegoly.grid(row=2,column=0)
 
-button_usun_obiekt=Button(ramka_lista_obiektow,text="Usuń obiekt")
+button_usun_obiekt=Button(ramka_lista_obiektow,text="Usuń obiekt", command=lambda: removeUser(users))
 button_usun_obiekt.grid(row=2, column=1)
 
-button_edytuj_obiekt=Button(ramka_lista_obiektow,text="Edytuj obiekt")
+button_edytuj_obiekt=Button(ramka_lista_obiektow,text="Edytuj obiekt", command=lambda: editUser(users))
 button_edytuj_obiekt.grid(row=2, column=2)
 
 # RAMKA FORMULARZ
