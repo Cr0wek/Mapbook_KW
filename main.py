@@ -1,9 +1,12 @@
 from tkinter import *
+import tkintermapview
+
+
 
 
 root= Tk()
 root.title("Mapbook")
-root.geometry("1025x760")
+root.geometry("1150x760")
 
 ramka_lista_obiektow= Frame(root)
 ramka_formularz=Frame(root)
@@ -12,8 +15,8 @@ ramka_mapa=Frame(root)
 
 ramka_lista_obiektow.grid(row=0,column=0)
 ramka_formularz.grid(row=0, column=1)
-ramka_szczegoly_obiektu.grid(row=1,column=0)
-ramka_mapa.grid(row=1,column=1)
+ramka_szczegoly_obiektu.grid(row=1,column=0, columnspan=2)
+ramka_mapa.grid(row=2,column=0,columnspan=2)
 
 # RAMKA LISTA OBIEKTOW
 label_lista_obiektow=Label(ramka_lista_obiektow, text="Lista obiektów")
@@ -53,7 +56,7 @@ entry_posty.grid(row=3,column=1)
 entry_imgurl=Entry(ramka_formularz)
 entry_imgurl.grid(row=4,column=1)
 
-button_dodaj_obiekt=Button(ramka_formularz, text="Dodaj obiekt")
+button_dodaj_obiekt=Button(ramka_formularz, text="Dodaj obiekt", command=lambda: addUser(users))
 button_dodaj_obiekt.grid(row=5,column=0,columnspan=2)
 
 # RAMKA SZCZEGOLY OBIEKTU
@@ -66,18 +69,18 @@ label_imie_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
 label_imie_szczegoly_obiektu_wartosc.grid(row=1,column=1)
 
 label_lokalizacja_szczegoly_obiektu=Label(ramka_szczegoly_obiektu, text="Lokalizacja: ")
-label_lokalizacja_szczegoly_obiektu.grid(row=2,column=0)
+label_lokalizacja_szczegoly_obiektu.grid(row=1,column=2)
 label_lokalizacja_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
-label_lokalizacja_szczegoly_obiektu_wartosc.grid(row=2,column=1)
+label_lokalizacja_szczegoly_obiektu_wartosc.grid(row=1,column=3)
 
 label_posty_szczegoly_obiektu=Label(ramka_szczegoly_obiektu, text="Posty: ")
-label_posty_szczegoly_obiektu.grid(row=3,column=0)
+label_posty_szczegoly_obiektu.grid(row=1,column=4)
 label_posty_szczegoly_obiektu_wartosc=Label(ramka_szczegoly_obiektu, text="....")
-label_posty_szczegoly_obiektu_wartosc.grid(row=3,column=1)
+label_posty_szczegoly_obiektu_wartosc.grid(row=1,column=5)
 
 # RAMKA MAPA
-map_widget=tkintermapview.TkinterMapView(ramka_mapa, width=1025, height=600, corner_radius=0)
-map_widget.set_posion(52.22977, 21.01178) # Warszawa
+map_widget=tkintermapview.TkinterMapView(ramka_mapa, width=800, height=600, corner_radius=10)
+map_widget.set_position(52.22977, 21.01178) # Warszawa
 map_widget.set_zoom(6)
 map_widget.grid(row=0,column=0)
 
