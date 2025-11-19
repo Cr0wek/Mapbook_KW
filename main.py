@@ -160,5 +160,6 @@ map_widget=tkintermapview.TkinterMapView(ramka_mapa, width=800, height=600, corn
 map_widget.set_position(52.22977, 21.01178) # Warszawa
 map_widget.set_zoom(10)
 map_widget.grid(row=0,column=0)
+map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
 
 root.mainloop()
