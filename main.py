@@ -1,6 +1,16 @@
 from tkinter import *
 import tkintermapview
 
+import psycopg2
+
+db_engine = psycopg2.connect(
+    user="postgres",
+    host="localhost",
+    database="postgres",
+    password='postgres',
+    port=5432
+)
+
 users:list=[]
 class User:
     def __init__(self, name:str, location:str, posts:int, img_url:str):
@@ -32,11 +42,16 @@ def entryClear():
     entry_name.focus()
 
 def addUser(usersdata:list)->None:
+    cursor = db_engine.cursor()
+    
     name:str=entry_name.get()
     location:str=entry_lokalizacja.get()
     posts:int=int(entry_posty.get())
     image:str=entry_imgurl.get()
-    usersdata.append(User(name=name, location=location, posts=posts, img_url=image))
+    user=User(name=name, location=location, posts=posts, img_url=image)  
+    usersdata.append(user)
+    cursor.execute(f"INSERT INTO public.users (name, location, posts, img_url, geometry) VALUES ('{name}', '{location}', {posts}, '{image}', ST_SetSRID(ST_MakePoint({user.coords[1]}, {user.coords[0]}), 4326))")
+    db_engine.commit()
     print(usersdata)
     user_info(usersdata)
     entryClear()
@@ -163,3 +178,5 @@ map_widget.grid(row=0,column=0)
 map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
 
 root.mainloop()
+
+#
