@@ -56,12 +56,6 @@ def addUser(usersdata:list)->None:
     tempUser.id=new_id
     usersdata.append(tempUser)
     print(f"New user with ID: {new_id}")
-    # Stara część
-    # user=User(name=name, location=location, posts=posts, img_url=image)  
-    # usersdata.append(user)
-    # cursor.execute(f"INSERT INTO public.users (name, location, posts, img_url, geometry) VALUES ('{name}', '{location}', {posts}, '{image}', ST_SetSRID(ST_MakePoint({user.coords[1]}, {user.coords[0]}), 4326))")
-    # db_engine.commit()
-    # print(usersdata)
     user_info(usersdata)
     entryClear()
     map_widget.set_position(usersdata[-1].coords[0], usersdata[-1].coords[1])
