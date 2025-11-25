@@ -10,10 +10,10 @@ db_engine = psycopg2.connect(
     password='postgres',
     port=5432
 )
-
 users:list=[]
 class User:
-    def __init__(self, name:str, location:str, posts:int, img_url:str):
+    def __init__(self, name:str, location:str, posts:int, img_url:str, id=None):
+        self.id = id
         self.name = name
         self.location = location
         self.posts = posts
@@ -43,16 +43,25 @@ def entryClear():
 
 def addUser(usersdata:list)->None:
     cursor = db_engine.cursor()
-    
     name:str=entry_name.get()
     location:str=entry_lokalizacja.get()
     posts:int=int(entry_posty.get())
     image:str=entry_imgurl.get()
-    user=User(name=name, location=location, posts=posts, img_url=image)  
-    usersdata.append(user)
-    cursor.execute(f"INSERT INTO public.users (name, location, posts, img_url, geometry) VALUES ('{name}', '{location}', {posts}, '{image}', ST_SetSRID(ST_MakePoint({user.coords[1]}, {user.coords[0]}), 4326))")
+    # Nowa część
+    tempUser=User(name=name, location=location, posts=posts, img_url=image, id=None)
+    SQL= f"INSERT INTO public.users (name, location, posts, img_url, geometry) VALUES ('{name}', '{location}', {posts}, '{image}', ST_SetSRID(ST_MakePoint({tempUser.coords[1]}, {tempUser.coords[0]}), 4326)) RETURNING id"
+    cursor.execute(SQL)
+    new_id=cursor.fetchone()[0]
     db_engine.commit()
-    print(usersdata)
+    tempUser.id=new_id
+    usersdata.append(tempUser)
+    print(f"New user with ID: {new_id}")
+    # Stara część
+    # user=User(name=name, location=location, posts=posts, img_url=image)  
+    # usersdata.append(user)
+    # cursor.execute(f"INSERT INTO public.users (name, location, posts, img_url, geometry) VALUES ('{name}', '{location}', {posts}, '{image}', ST_SetSRID(ST_MakePoint({user.coords[1]}, {user.coords[0]}), 4326))")
+    # db_engine.commit()
+    # print(usersdata)
     user_info(usersdata)
     entryClear()
     map_widget.set_position(usersdata[-1].coords[0], usersdata[-1].coords[1])
@@ -62,9 +71,24 @@ def user_info(usersdata:list)->None:
     for idx, user in enumerate(usersdata):
         listbox_lista_obiektow.insert(idx, f'{user.name} from {user.location} with {user.posts} posts')
         
+def user_info_startup(usersdata:list)->None:
+    if not usersdata:
+        cursor=db_engine.cursor()
+        cursor.execute("SELECT * FROM public.users")
+        records=cursor.fetchall()
+        for record in records:
+            user=User(name=record[1], location=record[2], posts=record[3], img_url=record[4], id=record[0])
+            usersdata.append(user)
+        user_info(usersdata)
+    else:
+        return
+        
 def removeUser(usersdata:list)->None:
     i=listbox_lista_obiektow.index(ACTIVE)
     usersdata[i].marker.delete()
+    cursor= db_engine.cursor()
+    cursor.execute(f"DELETE FROM public.users WHERE id={usersdata[i].id}")
+    db_engine.commit()
     usersdata.pop(i)
     user_info(usersdata)
     
@@ -91,10 +115,15 @@ def updateUser(usersdata:list, i:int)->None:
     usersdata[i].coords=usersdata[i].get_coords()
     usersdata[i].marker.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
     usersdata[i].marker.set_text(usersdata[i].name)
+    cursor=db_engine.cursor()
+    cursor.execute(f"UPDATE public.users SET name='{usersdata[i].name}', location='{usersdata[i].location}', posts={usersdata[i].posts}, img_url='{usersdata[i].img_url}', geometry=ST_SetSRID(ST_MakePoint({usersdata[i].coords[1]}, {usersdata[i].coords[0]}), 4326) WHERE id={usersdata[i].id}")
+    db_engine.commit()
     user_info(usersdata)
     map_widget.set_position(usersdata[i].coords[0], usersdata[i].coords[1])
     entryClear()
     button_dodaj_obiekt.config(text="Dodaj obiekt", command=lambda: addUser(users))
+
+
 
 root= Tk()
 root.title("Mapbook")
@@ -176,7 +205,7 @@ map_widget.set_position(52.22977, 21.01178) # Warszawa
 map_widget.set_zoom(10)
 map_widget.grid(row=0,column=0)
 map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
-
+user_info_startup(users)
 root.mainloop()
 
 #
