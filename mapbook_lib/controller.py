@@ -1,6 +1,3 @@
-from bs4 import BeautifulSoup
-import requests
-
 class User:
     def __init__(self, name:str, location:str, posts:int, img_url:str):
         self.name = name
